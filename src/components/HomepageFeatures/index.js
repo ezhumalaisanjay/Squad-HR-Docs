@@ -8,12 +8,21 @@ import {
   Zap,
   BarChart2,
   Users,
+  LayoutGrid, // Correctly imported LayoutGrid icon
 } from "lucide-react";
 
 const FeatureList = [
   {
-    title: "RBAC User Guide",
+    title: "Role-Based Access Control",
     icon: FileText,
+    description:
+      "Understand Role-Based Access Control (RBAC) and its implementation. Learn how to define roles, permissions, and multi-tenant access within your system.",
+    link: "/docs/category/RBAC",
+    color: "#FEF3C7",
+  },
+  {
+    title: "Appsync",
+    icon: LayoutGrid, // Using the LayoutGrid icon
     description:
       "Understand Role-Based Access Control (RBAC) and its implementation. Learn how to define roles, permissions, and multi-tenant access within your system.",
     link: "/docs/category/RBAC",
@@ -24,7 +33,7 @@ const FeatureList = [
 function Feature({ icon: Icon, title, description, link, color }) {
   return (
     <div className={clsx("col col--4", styles.feature)}>
-      <div className={styles.featureCard}>
+      <div  className={styles.featureCard}>
         <div className={styles.featureHeader}>
           <div
             className={styles.featureIconWrapper}
