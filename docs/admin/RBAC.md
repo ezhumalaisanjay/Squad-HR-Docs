@@ -1,84 +1,74 @@
 # Multi-Tenant Role-Based Access Control (RBAC)
 
-import { Users, Building, Briefcase, Layers, Grid, UsersCog } from 'lucide-react';
-
 ## Overview
 
-:::note
-Role-Based Access Control (RBAC) is a security model that restricts access based on user roles within a system. In a **multi-tenant** architecture, each tenant has a hierarchical structure defining organizations, departments, squads (channels), and users with specific roles and permissions.
-:::
+Role-Based Access Control (RBAC) is a method of restricting system access based on roles assigned to users. In a multi-tenant system, each tenant has a separate environment with its own users, roles, and permissions. This document outlines the structure, roles, and permissions for a multi-tenant RBAC model.
+
+---
 
 ## Hierarchical Structure
 
-### <UsersCog size={20} /> Tenant (Global Admin)
+1. **Tenant (Global Admin)**
+   - The highest level of the hierarchy.
+   - Each tenant represents an independent entity (e.g., a company or organization).
+   - The Global Admin has full control over all groups, organizations, and roles within the tenant.
 
-- The highest level in the hierarchy.
-- Controls the overall system and manages multiple groups.
-- Can create and manage organizations under different groups.
+2. **Group**
+   - A logical collection of organizations under the tenant.
+   - Example: "Tata" as the parent group.
 
-### <Building size={20} /> Group
+3. **Organization**
+   - Represents different business units or subsidiaries within a group.
+   - Example: "TCS," "Tata Salt," "Tata Steel."
 
-- Represents a high-level entity, such as a **parent company** or a **holding group**.
-- Can contain multiple organizations.
-- Managed by **Group Administrators**.
+4. **Department**
+   - Departments within an organization that handle specific functions.
+   - Example: "HR," "DevOps," "Sales," "Marketing."
 
-### <Briefcase size={20} /> Organization
+5. **Squad (Channel)**
+   - A sub-unit within a department that focuses on specific tasks or teams.
+   - Example: "HR" squad within the "HR Department."
 
-- A subdivision of a group, representing specific **companies** or **business units**.
-- Managed by **Organization Admins**.
-- Contains multiple **departments**.
+6. **Roles & Users**
+   - Users are assigned roles within squads, departments, or organizations.
+   - Roles define the level of access and permissions users have.
+   - Example: "HR Manager," "Developer," "Sales Executive."
 
-### <Layers size={20} /> Department
+7. **Permissions**
+   - Defines what actions a user can perform based on their role.
+   - Example: "View Employee Records," "Edit Payroll Information," "Approve Sales Deals."
 
-- Represents functional units within an organization (e.g., HR, DevOps, Sales, Marketing).
-- Each department has **Squads (Channels)** for better organization.
+---
 
-### <Grid size={20} /> Squad (Channel)
+## Example RBAC Model
 
-- A subunit of a department that groups users based on specific activities or tasks.
-- Examples: HR-Squad, DevOps-Squad, Sales-Squad.
+### **Tenant: Tata (Global Admin)**
 
-### <Users size={20} /> Users and Roles
-
-- Each user is assigned a **role** within a specific squad, department, or organization.
-- Roles define what actions users can perform.
-
-## Example Structure
-
-### Tenant: **Tata (Global Admin)**
-
-- **Group:** Tata Group
+- **Group:** Tata
   - **Organization:** TCS, Tata Salt, Tata Steel
     - **Department:** HR, DevOps, Sales, Marketing
-      - **Squad (Channel):** HR-Squad, DevOps-Squad, Sales-Squad
-        - **Users:** Employees, Managers
+      - **Squad:** HR
+        - **Users:** Employees within HR
+        - **Roles:** HR Manager, Recruiter, Payroll Admin
+        - **Permissions:**
+          - HR Manager: Full access to HR data
+          - Recruiter: View & edit job postings
+          - Payroll Admin: View & process payroll
 
-## Role & Permission Model
+---
 
-### **Roles**
+## Role-Based Permissions Table
 
-- **Global Admin**: Manages all tenants, groups, and organizations.
-- **Group Admin**: Manages an entire group and its organizations.
-- **Organization Admin**: Manages an organization and its departments.
-- **Department Admin**: Manages specific departments.
-- **Squad Leader**: Manages squads within a department.
-- **User**: General role assigned to employees.
+| Role            | Create | Read | Update | Delete |
+|----------------|--------|------|--------|--------|
+| Global Admin   | ✅     | ✅   | ✅     | ✅     |
+| Org Admin      | ✅     | ✅   | ✅     | ❌     |
+| Department Head| ✅     | ✅   | ✅     | ❌     |
+| Squad Leader   | ✅     | ✅   | ❌     | ❌     |
+| User           | ❌     | ✅   | ❌     | ❌     |
 
-### **Permissions**
+---
 
-```mdx-code-block
-import { Check, X } from 'lucide-react';
-```
+## Conclusion
 
-| Role                 | Create <Check size={16} /> | Read <Check size={16} /> | Update <Check size={16} /> | Delete <X size={16} /> |
-|----------------------|----------------|------|--------|--------|
-| Global Admin        | ✅      | ✅    | ✅      | ✅      |
-| Group Admin        | ✅      | ✅    | ✅      | ✅      |
-| Organization Admin | ✅      | ✅    | ✅      | ❌      |
-| Department Admin   | ✅      | ✅    | ✅      | ❌      |
-| Squad Leader      | ✅      | ✅    | ❌      | ❌      |
-| User              | ❌      | ✅    | ❌      | ❌      |
-
-## Summary
-
-This **multi-tenant RBAC** system ensures granular access control, allowing different levels of users to manage their respective scopes efficiently while ensuring security and compliance.
+This RBAC model ensures secure, structured access control across multiple tenants, organizations, and user roles. It provides scalability while maintaining clear permission boundaries based on user responsibilities.
