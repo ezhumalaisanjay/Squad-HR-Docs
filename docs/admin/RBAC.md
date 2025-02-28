@@ -1,76 +1,87 @@
-# Multi-Tenant Role-Based Access Control (RBAC)
+# 🏢 Multi-Tenant Role-Based Access Control (RBAC)
 
-## Overview
+## 🔍 Overview
 
 Role-Based Access Control (RBAC) is a security model that restricts access based on user roles within a system. In a **multi-tenant** architecture, each tenant has a hierarchical structure defining organizations, departments, squads (channels), and users with specific roles and permissions.
 
-## Hierarchical Structure
+---
 
-### 1. Tenant (Global Admin)
+## 🏗️ Hierarchical Structure
 
-- The highest level in the hierarchy.
-- Controls the overall system and manages multiple groups.
-- Can create and manage organizations under different groups.
+### 1️⃣ Tenant (**Global Admin**)
 
-### 2. Group
+- 🔹 The highest level in the hierarchy.
+- 🔹 Controls the overall system and manages multiple groups.
+- 🔹 Can create and manage organizations under different groups.
 
-- Represents a high-level entity, such as a **parent company** or a **holding group**.
-- Can contain multiple organizations.
-- Managed by **Group Administrators**.
+### 2️⃣ Group
 
-### 3. Organization
+- 🏢 Represents a high-level entity, such as a **parent company** or a **holding group**.
+- 🏢 Can contain multiple organizations.
+- 🏢 Managed by **Group Administrators**.
 
-- A subdivision of a group, representing specific **companies** or **business units**.
-- Managed by **Organization Admins**.
-- Contains multiple **departments**.
+### 3️⃣ Organization
 
-### 4. Department
+- 🏭 A subdivision of a group, representing specific **companies** or **business units**.
+- 🏭 Managed by **Organization Admins**.
+- 🏭 Contains multiple **departments**.
 
-- Represents functional units within an organization (e.g., HR, DevOps, Sales, Marketing).
-- Each department has **Squads (Channels)** for better organization.
+### 4️⃣ Department
 
-### 5. Squad (Channel)
+- 🏬 Represents functional units within an organization (e.g., HR, DevOps, Sales, Marketing).
+- 🏬 Each department has **Squads (Channels)** for better organization.
 
-- A subunit of a department that groups users based on specific activities or tasks.
-- Examples: HR-Squad, DevOps-Squad, Sales-Squad.
+### 5️⃣ Squad (**Channel**)
 
-### 6. Users and Roles
+- 💬 A subunit of a department that groups users based on specific activities or tasks.
+- 💬 Examples: **HR-Squad, DevOps-Squad, Sales-Squad**.
 
-- Each user is assigned a **role** within a specific squad, department, or organization.
-- Roles define what actions users can perform.
+### 6️⃣ Users & Roles
 
-## Example Structure
+- 👤 Each user is assigned a **role** within a specific squad, department, or organization.
+- 👤 Roles define what actions users can perform.
 
-### Tenant: **Tata (Global Admin)**
+---
 
-- **Group:** Tata Group
-  - **Organization:** TCS, Tata Salt, Tata Steel
-    - **Department:** HR, DevOps, Sales, Marketing
-      - **Squad (Channel):** HR-Squad, DevOps-Squad, Sales-Squad
-        - **Users:** Employees, Managers
+## 📌 Example Structure
 
-## Role & Permission Model
+```
+📌 Tenant: **Tata (Global Admin)**
+├── 🏢 Group: Tata Group
+│   ├── 🏭 Organization: TCS, Tata Salt, Tata Steel
+│   │   ├── 🏬 Department: HR, DevOps, Sales, Marketing
+│   │   │   ├── 💬 Squad (Channel): HR-Squad, DevOps-Squad, Sales-Squad
+│   │   │   │   ├── 👤 Users: Employees, Managers
+```
 
-### **Roles**
+---
 
-- **Global Admin**: Manages all tenants, groups, and organizations.
-- **Group Admin**: Manages an entire group and its organizations.
-- **Organization Admin**: Manages an organization and its departments.
-- **Department Admin**: Manages specific departments.
-- **Squad Leader**: Manages squads within a department.
-- **User**: General role assigned to employees.
+## 🔑 Role & Permission Model
 
-### **Permissions**
+### **🎭 Roles**
 
-| Role                 | Create | Read | Update | Delete |
-|----------------------|--------|------|--------|--------|
-| Global Admin        | ✅      | ✅    | ✅      | ✅      |
-| Group Admin        | ✅      | ✅    | ✅      | ✅      |
-| Organization Admin | ✅      | ✅    | ✅      | ❌      |
-| Department Admin   | ✅      | ✅    | ✅      | ❌      |
-| Squad Leader      | ✅      | ✅    | ❌      | ❌      |
-| User              | ❌      | ✅    | ❌      | ❌      |
+- **🛠️ Global Admin**: Manages all tenants, groups, and organizations.
+- **📂 Group Admin**: Manages an entire group and its organizations.
+- **🏢 Organization Admin**: Manages an organization and its departments.
+- **📌 Department Admin**: Manages specific departments.
+- **🔄 Squad Leader**: Manages squads within a department.
+- **👥 User**: General role assigned to employees.
 
-## Summary
+### **📝 Permissions**
 
-This **multi-tenant RBAC** system ensures granular access control, allowing different levels of users to manage their respective scopes efficiently while ensuring security and compliance.
+| Role                 | ✅ Create | 🔍 Read | ✏️ Update | ❌ Delete |
+|----------------------|----------|---------|----------|----------|
+| **Global Admin**    | ✅        | ✅       | ✅        | ✅       |
+| **Group Admin**     | ✅        | ✅       | ✅        | ✅       |
+| **Organization Admin** | ✅        | ✅       | ✅        | ❌       |
+| **Department Admin** | ✅        | ✅       | ✅        | ❌       |
+| **Squad Leader**    | ✅        | ✅       | ❌        | ❌       |
+| **User**            | ❌        | ✅       | ❌        | ❌       |
+
+---
+
+## 📌 Summary
+
+This **multi-tenant RBAC** system ensures **granular access control**, allowing different levels of users to manage their respective scopes efficiently while ensuring **security** and **compliance**.
+
+🚀 **Ensuring structured user management for a scalable and secure system!**
