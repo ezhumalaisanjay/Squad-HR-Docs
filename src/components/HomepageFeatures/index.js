@@ -1,20 +1,43 @@
-import clsx from 'clsx';
-import Heading from '@theme/Heading';
-import styles from './styles.module.css';
+import clsx from "clsx";
+import styles from "./styles.module.css";
+import Link from "@docusaurus/Link";
+import {
+  FileText,
+  Shield,
+  Smartphone,
+  Zap,
+  BarChart2,
+  Users,
+} from "lucide-react";
 
 const FeatureList = [
-
+  {
+    title: "RBAC User Guide",
+    icon: FileText,
+    description:
+      "Understand Role-Based Access Control (RBAC) and its implementation. Learn how to define roles, permissions, and multi-tenant access within your system.",
+    link: "/docs/category/RBAC",
+    color: "#FEF3C7",
+  },
 ];
 
-function Feature({Svg, title, description}) {
+function Feature({ icon: Icon, title, description, link, color }) {
   return (
-    <div className={clsx('col col--4')}>
-      <div className="text--center">
-        <Svg className={styles.featureSvg} role="img" />
-      </div>
-      <div className="text--center padding-horiz--md">
-        <Heading as="h3">{title}</Heading>
-        <p>{description}</p>
+    <div className={clsx("col col--4", styles.feature)}>
+      <div className={styles.featureCard}>
+        <div className={styles.featureHeader}>
+          <div
+            className={styles.featureIconWrapper}
+            style={{ backgroundColor: color }}
+          >
+            <Icon className={styles.featureIcon} />
+          </div>
+          <h3 className={styles.featureTitle}>{title}</h3>
+        </div>
+        <p className={styles.featureDescription}>{description}</p>
+        <div className={styles.featureLink}>
+          <Link to={link}>See More</Link>
+        </div>
       </div>
     </div>
   );
