@@ -28,7 +28,7 @@ function HomepageHeader() {
 export default function Home() {
   const { siteConfig } = useDocusaurusContext();
   return (
-    <Layout title={`${siteConfig.title}`} description="Help center for Facilio">
+    <Layout title={`${siteConfig.title}`} description="Help center for Squad HR">
       <HomepageHeader />
       <main>
         <HomepageFeatures />
