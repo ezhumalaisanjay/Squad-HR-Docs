@@ -1,95 +1,97 @@
 ---
-title: Inline Add Form with Checklist
+title: Inline Add Form with Testing Checklists
 ---
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function InlineAddForm() {
   const [title, setTitle] = useState('');
   const [items, setItems] = useState([]);
-  const tableRef = useRef(null);
 
-  // Load saved data from local storage
+  // Define checklist categories
+  const checklistCategories = {
+    "Functional Testing": [
+      "Verify that all features and functionalities work as expected.",
+      "Check form validations (mandatory fields, input formats, error messages).",
+      "Validate user authentication (login, logout, password reset).",
+      "Test user roles & permissions (admin, user, guest access).",
+      "Verify data integrity (correct data retrieval and storage).",
+      "Check file uploads and downloads functionality.",
+      "Ensure correct behavior of front-end actions (Filtering, Bulk actions, Detailed view)."
+    ],
+    "UI/UX Testing": [
+      "Ensure responsive design across devices and screen sizes.",
+      "Validate UI elements' alignment, spacing, colors, fonts, and consistency.",
+      "Verify navigation flow (all links and buttons work correctly).",
+      "Check for broken images, icons, and missing elements.",
+      "Validate error messages are user-friendly and clear.",
+      "Ensure interactive elements (buttons, dropdowns, checkboxes) function properly."
+    ],
+    "Performance Testing": [
+      "Test page load speed and responsiveness under different network conditions.",
+      "Perform stress testing (handling multiple concurrent users).",
+      "Check API response times and identify slow queries.",
+      "Ensure caching and data optimization mechanisms are in place."
+    ],
+    "Security Testing": [
+      "Test login attempts with incorrect credentials and brute-force attack prevention.",
+      "Validate session timeout and re-authentication handling.",
+      "Check encryption of sensitive data (passwords, tokens, API keys, etc.).",
+      "Test for SQL Injection, XSS, CSRF, and other vulnerabilities.",
+      "Verify role-based access control (RBAC) and restricted actions."
+    ]
+  };
+
+  // Load saved items from local storage
   useEffect(() => {
-    const savedItems = JSON.parse(localStorage.getItem('checklistItems')) || [];
-    setItems(savedItems);
+    const savedItems = JSON.parse(localStorage.getItem('checklistItems'));
+    setItems(Array.isArray(savedItems) ? savedItems : []);
   }, []);
 
-  // Save to local storage when items change
+  // Save items to local storage
   useEffect(() => {
     localStorage.setItem('checklistItems', JSON.stringify(items));
   }, [items]);
 
-  // Add new item to the table
+  // Add a new checklist category
   const handleAdd = () => {
-    if (title.trim()) {
-      setItems([...items, { title, UI: false, Frontend: false, Backend: false, Testing: false }]);
+    if (!title.trim()) return;
+
+    if (Array.isArray(items) && !items.some(item => item.title === title)) {
+      setItems([...items, { title, expanded: false, checks: (checklistCategories[title] || []).map(text => ({ text, checked: false })) }]);
       setTitle('');
     }
   };
 
-  // Handle checkbox changes
-  const handleCheckboxChange = (index, key) => {
+  // Toggle checklist visibility
+  const toggleExpand = (index) => {
+    setItems(items.map((item, i) => i === index ? { ...item, expanded: !item.expanded } : item));
+  };
+
+  // Handle checkbox toggle
+  const handleCheckboxChange = (index, checkIndex) => {
     const updatedItems = items.map((item, i) =>
-      i === index ? { ...item, [key]: !item[key] } : item
+      i === index
+        ? { ...item, checks: item.checks.map((check, j) => (j === checkIndex ? { ...check, checked: !check.checked } : check)) }
+        : item
     );
     setItems(updatedItems);
   };
 
-  // Handle row deletion
+  // Delete a checklist category
   const handleDelete = (index) => {
-    const updatedItems = items.filter((_, i) => i !== index);
-    setItems(updatedItems);
+    setItems(items.filter((_, i) => i !== index));
   };
 
-  // Make table columns resizable
-  useEffect(() => {
-    if (!tableRef.current) return;
-    const table = tableRef.current;
-    const cols = table.querySelectorAll('th');
-    let isResizing = false;
-    let startX, startWidth, targetCol;
-
-    cols.forEach((col) => {
-      const resizer = document.createElement('div');
-      resizer.style.width = '5px';
-      resizer.style.cursor = 'col-resize';
-      resizer.style.position = 'absolute';
-      resizer.style.top = '0';
-      resizer.style.right = '0';
-      resizer.style.bottom = '0';
-      resizer.style.zIndex = '1';
-      col.style.position = 'relative';
-      col.appendChild(resizer);
-
-      resizer.addEventListener('mousedown', (e) => {
-        isResizing = true;
-        startX = e.pageX;
-        startWidth = col.offsetWidth;
-        targetCol = col;
-      });
-
-      document.addEventListener('mousemove', (e) => {
-        if (!isResizing) return;
-        const newWidth = startWidth + (e.pageX - startX);
-        targetCol.style.width = `${newWidth}px`;
-      });
-
-      document.addEventListener('mouseup', () => {
-        isResizing = false;
-      });
-    });
-  }, [items]);
-
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto', fontFamily: 'Arial, sans-serif' }}>
-      <h2 style={{ textAlign: 'center' }}>Inline Add Form</h2>
+    <div style={{ maxWidth: '900px', margin: '0 auto', fontFamily: 'Arial, sans-serif' }}>
+      <h2 style={{ textAlign: 'center' }}>Testing Checklist</h2>
 
-      {/* Title Input and Add Button */}
+      {/* Input for adding new categories */}
       <div style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
         <input
           type="text"
-          placeholder="Enter Title"
+          placeholder="Enter Testing Category"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           style={{
@@ -117,7 +119,7 @@ export default function InlineAddForm() {
       {/* Display Table */}
       {items.length > 0 && (
         <div style={{ overflowX: 'auto' }}>
-          <table ref={tableRef} style={{
+          <table style={{
             width: '100%',
             borderCollapse: 'collapse',
             textAlign: 'left',
@@ -125,44 +127,56 @@ export default function InlineAddForm() {
           }}>
             <thead>
               <tr style={{ backgroundColor: '#f8f9fa' }}>
-                <th style={{ padding: '10px', borderBottom: '2px solid #ddd', minWidth: '150px' }}>Title</th>
-                <th style={{ textAlign: 'center', padding: '10px', borderBottom: '2px solid #ddd', minWidth: '100px' }}>UI</th>
-                <th style={{ textAlign: 'center', padding: '10px', borderBottom: '2px solid #ddd', minWidth: '100px' }}>Frontend</th>
-                <th style={{ textAlign: 'center', padding: '10px', borderBottom: '2px solid #ddd', minWidth: '100px' }}>Backend</th>
-                <th style={{ textAlign: 'center', padding: '10px', borderBottom: '2px solid #ddd', minWidth: '100px' }}>Testing</th>
-                <th style={{ textAlign: 'center', padding: '10px', borderBottom: '2px solid #ddd', minWidth: '80px' }}>Action</th>
+                <th style={{ padding: '10px', borderBottom: '2px solid #ddd', width: '50%' }}>Testing Category</th>
+                <th style={{ textAlign: 'center', padding: '10px', borderBottom: '2px solid #ddd', width: '20%' }}>Completion</th>
+                <th style={{ textAlign: 'center', padding: '10px', borderBottom: '2px solid #ddd', width: '10%' }}>Expand ▼</th>
+                <th style={{ textAlign: 'center', padding: '10px', borderBottom: '2px solid #ddd', width: '10%' }}>Action</th>
               </tr>
             </thead>
             <tbody>
-              {items.map((item, index) => (
-                <tr key={index} style={{ borderBottom: '1px solid #ddd' }}>
-                  <td style={{ padding: '10px' }}>{item.title}</td>
-                  {['UI', 'Frontend', 'Backend', 'Testing'].map((key) => (
-                    <td key={key} style={{ textAlign: 'center', padding: '10px' }}>
-                      <input
-                        type="checkbox"
-                        checked={item[key]}
-                        onChange={() => handleCheckboxChange(index, key)}
-                      />
-                    </td>
-                  ))}
-                  <td style={{ textAlign: 'center', padding: '10px' }}>
-                    <button
-                      onClick={() => handleDelete(index)}
-                      style={{
-                        backgroundColor: '#dc3545',
-                        color: 'white',
-                        border: 'none',
-                        padding: '5px 10px',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {items.map((item, index) => {
+                const completed = item.checks.filter(check => check.checked).length;
+                const total = item.checks.length;
+                const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+                return (
+                  <>
+                    {/* Main Row */}
+                    <tr key={index} style={{ borderBottom: '1px solid #ddd' }}>
+                      <td style={{ padding: '10px', fontWeight: 'bold' }}>{item.title}</td>
+                      <td style={{ textAlign: 'center', padding: '10px' }}>{percentage}%</td>
+                      <td style={{ textAlign: 'center', padding: '10px', cursor: 'pointer' }} onClick={() => toggleExpand(index)}>
+                        {item.expanded ? '▲' : '▼'}
+                      </td>
+                      <td style={{ textAlign: 'center', padding: '10px' }}>
+                        <button onClick={() => handleDelete(index)} style={{ backgroundColor: '#dc3545', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer' }}>
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+
+                    {/* Expandable Checklist Table */}
+                    {item.expanded && (
+                      <tr>
+                        <td colSpan="4" style={{ padding: '10px' }}>
+                          <table width="100%" border="1" style={{ borderCollapse: 'collapse' }}>
+                            <tbody>
+                              {item.checks.map((check, checkIndex) => (
+                                <tr key={checkIndex}>
+                                  <td style={{ padding: '8px' }}>
+                                    <input type="checkbox" checked={check.checked} onChange={() => handleCheckboxChange(index, checkIndex)} />
+                                  </td>
+                                  <td style={{ padding: '8px' }}>{check.text}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </td>
+                      </tr>
+                    )}
+                  </>
+                );
+              })}
             </tbody>
           </table>
         </div>
