@@ -1,120 +1,90 @@
-# Quality Assurance (QA) and Testing Process
+# Automating Unit Tests for ShadCN UI Components with AWS Lambda & CodeCommit
 
-## 1. Requirements Analysis
+## Overview
 
-**Objective:** Understand the requirements of your application to ensure tests align with the functionality.  
-**Actions:**
+This document describes how to automate unit test generation and execution for ShadCN UI components in a Next.js project using AWS Lambda, CodeCommit, and CodeBuild.
 
-- Review functional and non-functional requirements (e.g., performance, security).
-- Understand user stories, use cases, and workflows to create appropriate test cases.
+## Project Structure
 
-## 2. Test Planning
+```
+/my-project
+│── /app
+│   ├── /components    # Custom UI components
+│   ├── /ui            # ShadCN components
+│── /__tests__         # Test files will be stored here
+│── package.json       # Project dependencies
+│── jest.config.js     # Jest configuration
+│── buildspec.yml      # AWS CodeBuild configuration
+```
 
-**Objective:** Plan the testing process and outline the scope, objectives, resources, and schedules.  
-**Actions:**
+## Steps
 
-- **Define the scope of testing:** What will be tested and what will not (e.g., specific modules, features, or platforms).
-- **Identify resources:** Determine who will perform the tests (e.g., QA engineers, developers).
-- **Set up timelines:** How long testing will take.
-- **Choose testing tools:** Decide on the testing tools (e.g., Selenium for automation, JUnit for unit testing).
-- **Define the types of tests** to be performed (e.g., functional, performance, security).
+### 1. Set Up AWS Lambda for CodeCommit Push Event
 
-## 3. Test Case Design
+- Create a Lambda function.
+- Configure a trigger for AWS CodeCommit push events.
+- Use AWS SDK to retrieve modified `.ts` files in `/components/` and `/ui/`.
 
-**Objective:** Create detailed test cases to verify different aspects of the application.  
-**Actions:**
+### 2. Generate Unit Test Files
 
-- Write test cases based on functional specifications.
-- Define the **test input** (what data will be used) and **expected output**.
-- Identify edge cases and potential failure points to test.
-- Consider different testing levels (unit tests, integration tests, system tests, etc.).
+- Identify modified component files.
+- Dynamically generate test files in `__tests__/`.
+- Example test template for a button component:
+  
+  ```ts
+  import { render, screen } from "@testing-library/react";
+  import { Button } from "@/app/ui/button";
 
-## 4. Test Environment Setup
+  describe("Button Component", () => {
+    test("renders correctly", () => {
+      render(<Button>Click Me</Button>);
+      expect(screen.getByText("Click Me")).toBeInTheDocument();
+    });
+  });
+  ```
 
-**Objective:** Set up the environment where the application will be tested (development, staging, or production environments).  
-**Actions:**
+### 3. Commit Generated Test Files
 
-- Set up the test database, server, and any necessary software configurations.
-- Ensure the test environment mirrors the production environment as closely as possible.
-- Configure the necessary testing tools and frameworks (e.g., browser setups for UI tests).
+- Use AWS SDK to commit `.test.tsx` files to CodeCommit.
 
-## 5. Test Execution
+### 4. Configure AWS CodeBuild to Run Tests
 
-**Objective:** Execute the test cases in the test environment and report the results.  
-**Actions:**
+- Install Jest dependencies:
 
-- **Manual Testing:** Perform tests manually if they require human intervention (e.g., UI testing).
-- **Automated Testing:** Run automated test scripts if the tests are repetitive or require a large number of test iterations (e.g., regression testing).
-- **Perform different types of tests:**
-  - **Functional Testing:** Verify that the application behaves according to the specifications.
-  - **Usability Testing:** Evaluate how user-friendly the application is.
-  - **Security Testing:** Test for vulnerabilities and ensure data protection.
-  - **Performance Testing:** Check how the app performs under different conditions (e.g., load testing, stress testing).
-  - **Compatibility Testing:** Ensure compatibility with different browsers, devices, or operating systems.
-  - **Regression Testing:** Ensure new changes haven't broken existing functionality.
+  ```bash
+  npm install --save-dev jest @testing-library/react @testing-library/jest-dom
+  ```
 
-## 6. Bug Reporting
+- Configure `jest.config.js`:
 
-**Objective:** Identify, document, and report defects or issues found during testing.  
-**Actions:**
+  ```js
+  module.exports = {
+    testEnvironment: "jsdom",
+    setupFilesAfterEnv: ["@testing-library/jest-dom/extend-expect"],
+  };
+  ```
 
-- If a bug is found, log it in a bug tracking system (e.g., Jira, Bugzilla).
-- Provide detailed information on the bug: steps to reproduce, expected result, actual result, severity, and screenshots/logs.
-- Classify bugs based on severity (critical, high, medium, low).
+- Create `buildspec.yml` for CodeBuild:
 
-## 7. Bug Fixing
+  ```yaml
+  version: 0.2
+  phases:
+    install:
+      commands:
+        - npm install
+    build:
+      commands:
+        - npm run test
+  ```
 
-**Objective:** Developers fix the identified bugs or issues.  
-**Actions:**
+### 5. Send Test Results to Chat App
 
-- Once bugs are reported, the development team works on fixing them.
-- Developers will work on code fixes, and once they’re done, they will notify the QA team.
+- Use AWS Lambda or CodeBuild to send test results via webhook to Slack/Discord.
 
-## 8. Retesting and Regression Testing
+## Tech Stack
 
-**Objective:** Verify that the fixed bugs are resolved, and no new issues are introduced.  
-**Actions:**
-
-- Perform **retesting** on the fixed bugs to confirm they are resolved.
-- Conduct **regression testing** to ensure that changes don’t affect existing functionality.
-- Verify that the overall application still works as expected with the new changes.
-
-## 9. User Acceptance Testing (UAT)
-
-**Objective:** Get final validation from the end users or product owners.  
-**Actions:**
-
-- Present the application to the stakeholders (business owners, clients, or end-users).
-- Users verify if the application meets their requirements and expectations.
-- Gather feedback and make necessary adjustments.
-
-## 10. Test Closure
-
-**Objective:** Finalize the testing process and document the results.  
-**Actions:**
-
-- Analyze testing coverage (did the tests cover all aspects of the application?).
-- Provide a test summary report detailing what was tested, the number of bugs found, and their severity.
-- Archive test artifacts and documents for future reference.
-- Provide a final sign-off from the QA team or project stakeholders.
-
-## 11. Post-Release Testing
-
-**Objective:** Ensure the application continues to work correctly after release.  
-**Actions:**
-
-- Monitor the application in production for any unexpected behavior.
-- Perform smoke testing or sanity testing to confirm the stability of the production release.
-- Address any issues that arise in production.
-
----
-
-## Key Types of Testing
-
-1. **Unit Testing:** Focuses on individual components of the application (usually done by developers).
-2. **Integration Testing:** Ensures that different parts of the application work together as expected.
-3. **System Testing:** Validates the entire system as a whole.
-4. **User Interface (UI) Testing:** Checks the application's front-end user interface.
-5. **Performance Testing:** Analyzes how well the system performs under load.
-6. **Security Testing:** Ensures that the application is secure from external threats.
-7. **Acceptance Testing:** Verifies that the application meets the end-user needs and requirements.
+- **AWS Lambda** (CodeCommit event trigger)
+- **AWS CodeCommit** (Git repository)
+- **Jest + React Testing Library** (Testing framework)
+- **AWS CodeBuild** (Test automation)
+- **Slack/Discord API** (Test result notifications)
